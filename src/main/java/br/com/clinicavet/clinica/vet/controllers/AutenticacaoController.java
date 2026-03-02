@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
+@CrossOrigin(origins = "*")
 public class AutenticacaoController {
 
     @Autowired
@@ -47,9 +48,17 @@ public class AutenticacaoController {
     public ResponseEntity esqueciSenha(@RequestBody RecuperarSenhaDTO data) {
         try {
             usuarioService.recuperarSenha(data.email());
-            return ResponseEntity.ok("E-mail com a nova senha enviado com sucesso!");
+            // Retorna um JSON no formato {"sucesso": true, "mensagem": "..."}
+            return ResponseEntity.ok(java.util.Map.of(
+                    "sucesso", true,
+                    "mensagem", "E-mail com a nova senha enviado com sucesso!"
+            ));
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            // Retorna o erro no formato {"sucesso": false, "mensagem": "..."}
+            return ResponseEntity.badRequest().body(java.util.Map.of(
+                    "sucesso", false,
+                    "mensagem", e.getMessage()
+            ));
         }
     }
     @PostMapping("/registrar")

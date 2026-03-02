@@ -18,7 +18,7 @@ public class ClienteService {
     private ClienteRepository clienteRepository;
 
     @Autowired
-    private ModelMapper modelMapper; // Injetando o ModelMapper aqui!
+    private ModelMapper modelMapper;
 
     public List<ClienteResponseDTO> listarClientes() {
         List<Cliente> clientes = clienteRepository.findAll();
@@ -29,13 +29,12 @@ public class ClienteService {
     }
 
     public ClienteResponseDTO criarCliente(ClienteRequestDTO dto) {
-        // 1. Converte o DTO para Entidade magicamente
+        if (clienteRepository.existsByCpf(dto.getCpf())) {
+            throw new RuntimeException("Já existe um cliente cadastrado com este CPF.");
+        }
+
         Cliente cliente = modelMapper.map(dto, Cliente.class);
-
-        // 2. Salva no banco
         Cliente clienteSalvo = clienteRepository.save(cliente);
-
-        // 3. Converte a Entidade salva de volta para DTO
         return modelMapper.map(clienteSalvo, ClienteResponseDTO.class);
     }
 }
