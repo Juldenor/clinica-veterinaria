@@ -1,4 +1,4 @@
-##🐾 Sistema de Clínica Veterinária
+#🐾 Sistema de Clínica Veterinária
 
 Sistema web simples para gerenciamento de uma clínica veterinária.
 
