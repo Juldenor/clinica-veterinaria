@@ -38,3 +38,11 @@ O projeto está dividido em:
 
 ---
 
+## 🗄️ Banco de Dados
+
+O banco de dados utilizado é PostgreSQL.
+
+O arquivo `bank.sql` presente no repositório contém o backup do banco com as tabelas do sistema.
+
+Para recriar o banco, basta importar o arquivo no PostgreSQL.
+
