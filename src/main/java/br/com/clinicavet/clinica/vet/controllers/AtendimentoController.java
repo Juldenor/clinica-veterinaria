@@ -2,6 +2,7 @@ package br.com.clinicavet.clinica.vet.controllers;
 
 import br.com.clinicavet.clinica.vet.dtos.AtendimentoRequestDTO;
 import br.com.clinicavet.clinica.vet.dtos.AtendimentoResponseDTO;
+import br.com.clinicavet.clinica.vet.dtos.AtendimentoStatusRequestDTO;
 import br.com.clinicavet.clinica.vet.model.Atendimento;
 import br.com.clinicavet.clinica.vet.model.Animal;
 import br.com.clinicavet.clinica.vet.model.Veterinario;
@@ -10,8 +11,10 @@ import br.com.clinicavet.clinica.vet.repositories.AtendimentoRepository;
 import br.com.clinicavet.clinica.vet.repositories.AnimalRepository;
 import br.com.clinicavet.clinica.vet.repositories.VeterinarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,5 +57,34 @@ public class AtendimentoController {
     public ResponseEntity<List<AtendimentoResponseDTO>> listar() {
         var lista = atendimentoRepository.findAll().stream().map(AtendimentoResponseDTO::new).collect(Collectors.toList());
         return ResponseEntity.ok(lista);
+    }
+
+    @GetMapping("/animal/{animalId}")
+    public ResponseEntity<List<AtendimentoResponseDTO>> listarPorAnimal(@PathVariable Long animalId) {
+        if (!animalRepository.existsById(animalId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Animal nao encontrado!");
+        }
+
+        var lista = atendimentoRepository.findByAnimalIdOrderByDataAtendimentoDesc(animalId)
+                .stream()
+                .map(AtendimentoResponseDTO::new)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(lista);
+    }
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<AtendimentoResponseDTO> atualizarStatus(@PathVariable Long id, @RequestBody AtendimentoStatusRequestDTO data) {
+        Atendimento atendimento = atendimentoRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Atendimento nao encontrado!"));
+
+        try {
+            atendimento.setStatus(StatusAtendimento.valueOf(data.status().trim().toUpperCase()));
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status de atendimento invalido!");
+        }
+
+        atendimentoRepository.save(atendimento);
+        return ResponseEntity.ok(new AtendimentoResponseDTO(atendimento));
     }
 }

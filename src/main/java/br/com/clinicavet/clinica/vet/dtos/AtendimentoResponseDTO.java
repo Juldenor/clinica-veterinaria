@@ -5,6 +5,8 @@ import java.time.LocalDate;
 
 public record AtendimentoResponseDTO(
     Long id,
+    Long animalId,
+    Long veterinarioId,
     String animalNome,
     String veterinarioNome,
     LocalDate dataAtendimento,
@@ -15,6 +17,8 @@ public record AtendimentoResponseDTO(
     public AtendimentoResponseDTO(Atendimento a) {
         this(
             a.getId(),
+            a.getAnimal() != null ? a.getAnimal().getId() : null,
+            a.getVeterinario() != null ? a.getVeterinario().getId() : null,
             a.getAnimal() != null ? a.getAnimal().getNome() : "Desconhecido",
             a.getVeterinario() != null ? a.getVeterinario().getNome() : "Desconhecido",
             a.getDataAtendimento(),
